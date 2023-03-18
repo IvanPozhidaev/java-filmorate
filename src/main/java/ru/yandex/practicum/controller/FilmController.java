@@ -5,7 +5,6 @@ import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.model.Film;
-import ru.yandex.practicum.model.User;
 
 import java.time.LocalDate;
 import java.util.Collection;
