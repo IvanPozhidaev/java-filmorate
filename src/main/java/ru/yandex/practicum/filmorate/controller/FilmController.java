@@ -1,11 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.ValidateException;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,15 +22,15 @@ public class FilmController {
     private void validateFilmFields(@Valid @RequestBody Film film) {
         if (film.getReleaseDate().isBefore(DATA_THRESHOLD)) {
             log.warn("Дата выпуска фильма: {}", film.getReleaseDate());
-            throw new ValidationException("Указанная дата фильма раньше, чем 28 декабря 1895 года");
+            throw new ValidateException("Указанная дата фильма раньше, чем 28 декабря 1895 года");
         }
         if (film.getDuration() <= 0) {
             log.warn("Продолжительность фильма: {}", film.getDuration());
-            throw new ValidationException("Указанная продолжительность фильма меньше или равна нулю");
+            throw new ValidateException("Указанная продолжительность фильма меньше или равна нулю");
         }
         if (film.getDescription().length() > 200 || film.getDescription().length() < 1) {
             log.warn("Описание фильма: {}", film.getDescription());
-            throw new ValidationException("Несоответствующее количество символов в описании фильма");
+            throw new ValidateException("Несоответствующее количество символов в описании фильма");
         }
 
     }
@@ -53,7 +53,7 @@ public class FilmController {
     public Film put(@Valid @RequestBody Film film) {
         validateFilmFields(film);
         if(!films.containsKey(film.getId())) {
-            throw new ValidationException("Обновление данных о фильме невозможно - такого фильма нет в базе");
+            throw new ValidateException("Обновление данных о фильме невозможно - такого фильма нет в базе");
         }
         films.put(film.getId(), film);
         log.info("Успешное обновление информации о фильме: {}",film.getName());
