@@ -14,11 +14,12 @@ import java.util.Map;
 @RestController
 @Slf4j
 @RequestMapping("/users")
-public class UserController {
+public class UserController extends Controller<User> {
     private int id = 1;
     private final Map<Integer, User> users = new HashMap<>();
 
-    private void validateUserFields(@Valid @RequestBody User user) {
+    @Override
+    public void validateFields(@Valid @RequestBody User user) {
         if (user.getLogin().contains(" ")) {
             log.warn("Логин пользователя: {}", user.getLogin());
             throw new ValidateException("Логин не может содержать пробелы");
@@ -33,13 +34,15 @@ public class UserController {
     }
 
     @GetMapping
-    public Collection<User> getAllUsers() {
+    @Override
+    public Collection<User> getAll() {
         return users.values();
     }
 
     @PostMapping
+    @Override
     public User create(@Valid @RequestBody User user) {
-        validateUserFields(user);
+        validateFields(user);
         user.setId(id++);
         users.put(user.getId(), user);
         log.info("Пользователь с логином: {}, успешно добавлен", user.getLogin());
@@ -47,8 +50,9 @@ public class UserController {
     }
 
     @PutMapping
+    @Override
     public User put(@Valid @RequestBody User user) {
-        validateUserFields(user);
+        validateFields(user);
         if(!users.containsKey(user.getId())) {
             throw new ValidateException("Обновление данных о пользователе невозможно, т.к. его нет в базе");
         }

@@ -14,12 +14,13 @@ import java.util.Map;
 @RestController
 @Slf4j
 @RequestMapping("/films")
-public class FilmController {
+public class FilmController extends Controller<Film> {
     private int id = 1;
     private final Map<Integer, Film> films = new HashMap<>();
     private static final LocalDate DATA_THRESHOLD = LocalDate.of(1895, 12, 28);
 
-    private void validateFilmFields(@Valid @RequestBody Film film) {
+    @Override
+    public void validateFields(@Valid @RequestBody Film film) {
         if (film.getReleaseDate().isBefore(DATA_THRESHOLD)) {
             log.warn("Дата выпуска фильма: {}", film.getReleaseDate());
             throw new ValidateException("Указанная дата фильма раньше, чем 28 декабря 1895 года");
@@ -36,13 +37,15 @@ public class FilmController {
     }
 
     @GetMapping
-    public Collection<Film> getAllFilms() {
+    @Override
+    public Collection<Film> getAll() {
         return films.values();
     }
 
     @PostMapping
+    @Override
     public Film create(@Valid @RequestBody Film film) {
-        validateFilmFields(film);
+        validateFields(film);
         film.setId(id++);
         films.put(film.getId(), film);
         log.info("Фильм: {}, успешно добавлен", film.getName());
@@ -50,8 +53,9 @@ public class FilmController {
     }
 
     @PutMapping
+    @Override
     public Film put(@Valid @RequestBody Film film) {
-        validateFilmFields(film);
+        validateFields(film);
         if(!films.containsKey(film.getId())) {
             throw new ValidateException("Обновление данных о фильме невозможно - такого фильма нет в базе");
         }
