@@ -21,7 +21,7 @@ public class InMemoryUserStorage implements UserStorage {
             log.warn("Логин пользователя: {}", user.getLogin());
             throw new ValidateException("Логин не может содержать пробелы или быть пустым");
         }
-        if(user.getName() == null || user.getName().isBlank() || user.getName().contains("")) {
+        if (user.getName() == null || user.getName().isBlank() || user.getName().contains("")) {
             user.setName(user.getLogin());
             log.warn("Имя пользователя было не заполнено или было пустое - заменено на логин {}", user.getLogin());
         }
@@ -29,7 +29,7 @@ public class InMemoryUserStorage implements UserStorage {
             log.warn("Возраст пользователя: {}", user.getBirthday());
             throw new ValidateException("Дата рождения пользователя указана в будущем");
         }
-        if(user.getEmail().isBlank() || user.getEmail() == null || user.getEmail().equals(" ")) {
+        if (user.getEmail().isBlank() || user.getEmail() == null || user.getEmail().equals(" ")) {
             log.warn("Email пользователя: {}", user.getEmail());
             throw new ValidateException("Поле email не должно быть пустым");
         }
@@ -49,7 +49,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User update(User user) {
         validateFields(user);
-        if(!users.containsKey(user.getId())) {
+        if (!users.containsKey(user.getId())) {
             throw new ValidateException("Обновление данных о пользователе невозможно, т.к. его нет в базе");
         }
         users.put(user.getId(), user);

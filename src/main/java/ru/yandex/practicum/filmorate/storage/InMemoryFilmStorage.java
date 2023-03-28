@@ -19,7 +19,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Integer, Film> films = new HashMap<>();
 
     void validateFields(Film film) {
-        if(film.getName().isBlank()) {
+        if (film.getName().isBlank()) {
             log.warn("Название фильма: {}", film.getName());
             throw new ValidateException("Пустое поле вместо названия фильма недопустимо");
         }
@@ -49,11 +49,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         validateFields(film);
-        if(!films.containsKey(film.getId())) {
+        if (!films.containsKey(film.getId())) {
             throw new ValidateException("Обновление данных о фильме невозможно - такого фильма нет в базе");
         }
         films.put(film.getId(), film);
-        log.info("Успешное обновление информации о фильме: {}",film.getName());
+        log.info("Успешное обновление информации о фильме: {}", film.getName());
         return film;
     }
 
