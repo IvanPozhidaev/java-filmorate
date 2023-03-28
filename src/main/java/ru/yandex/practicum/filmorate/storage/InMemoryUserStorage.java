@@ -2,7 +2,8 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.ValidateException;
+import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
@@ -19,19 +20,19 @@ public class InMemoryUserStorage implements UserStorage {
     void validateFields(User user) {
         if (user.getLogin().contains(" ") || user.getLogin().isBlank()) {
             log.warn("Логин пользователя: {}", user.getLogin());
-            throw new ValidateException("Логин не может содержать пробелы или быть пустым");
+            throw new ValidationException("Логин не может содержать пробелы или быть пустым");
         }
-        if (user.getName() == null || user.getName().isBlank() || user.getName().contains("")) {
+        if (user.getName() == null || user.getName().equals("")) {
             user.setName(user.getLogin());
             log.warn("Имя пользователя было не заполнено или было пустое - заменено на логин {}", user.getLogin());
         }
         if (user.getBirthday().isAfter(LocalDate.now())) {
             log.warn("Возраст пользователя: {}", user.getBirthday());
-            throw new ValidateException("Дата рождения пользователя указана в будущем");
+            throw new ValidationException("Дата рождения пользователя указана в будущем");
         }
         if (user.getEmail().isBlank() || user.getEmail() == null || user.getEmail().equals(" ")) {
             log.warn("Email пользователя: {}", user.getEmail());
-            throw new ValidateException("Поле email не должно быть пустым");
+            throw new ValidationException("Поле email не должно быть пустым");
         }
     }
 
@@ -50,7 +51,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User update(User user) {
         validateFields(user);
         if (!users.containsKey(user.getId())) {
-            throw new ValidateException("Обновление данных о пользователе невозможно, т.к. его нет в базе");
+            throw new ObjectNotFoundException("Обновление данных о пользователе невозможно, т.к. его нет в базе");
         }
         users.put(user.getId(), user);
         log.info("Успешное обновление информации о пользователе с id: {}, и логином {}", user.getId(), user.getLogin());
