@@ -33,7 +33,7 @@ public class UserService {
     }
 
     public User getById(int id) {
-        if(!userStorage.getUsers().containsKey(id)) {
+        if (!userStorage.getUsers().containsKey(id)) {
             throw new ObjectNotFoundException("Пользователь не найден");
         }
         log.info("Пользователь с id {} отправлен", id);
@@ -41,7 +41,7 @@ public class UserService {
     }
 
     public User deleteById(int id) {
-        if(!userStorage.getUsers().containsKey(id)) {
+        if (!userStorage.getUsers().containsKey(id)) {
             throw new ObjectNotFoundException("Пользователь не найден - удаление невозможно");
         }
         log.info("Пользователь с id {} удалён", id);
@@ -49,10 +49,10 @@ public class UserService {
     }
 
     public List<User> addFriend(int firstId, int secondId) {
-        if(!userStorage.getUsers().containsKey(firstId) || !userStorage.getUsers().containsKey(secondId)) {
+        if (!userStorage.getUsers().containsKey(firstId) || !userStorage.getUsers().containsKey(secondId)) {
             throw new ObjectNotFoundException("По данным id один или несколько пользователей не найдены");
         }
-        if(userStorage.getById(firstId).getFriends().contains(secondId)) {
+        if (userStorage.getById(firstId).getFriends().contains(secondId)) {
             throw new InternalException("Пользователи уже являются друзьями");
         }
         userStorage.getById(firstId).getFriends().add(secondId);
@@ -64,10 +64,10 @@ public class UserService {
     }
 
     public List<User> deleteFriend(int firstId, int secondId) {
-        if(!userStorage.getUsers().containsKey(firstId) || !userStorage.getUsers().containsKey(secondId)) {
+        if (!userStorage.getUsers().containsKey(firstId) || !userStorage.getUsers().containsKey(secondId)) {
             throw new ObjectNotFoundException("По данным id один или несколько пользователей не найдены");
         }
-        if(!userStorage.getById(firstId).getFriends().contains(secondId)) {
+        if (!userStorage.getById(firstId).getFriends().contains(secondId)) {
             throw new InternalException("Пользователи не являются друзьями");
         }
         userStorage.getById(firstId).getFriends().remove(secondId);
@@ -79,7 +79,7 @@ public class UserService {
     }
 
     public List<User> getFriendsListById(int id) {
-        if(!userStorage.getUsers().containsKey(id)) {
+        if (!userStorage.getUsers().containsKey(id)) {
             throw new ObjectNotFoundException("Пользователь не найден - невозможно получить список друзей");
         }
         log.info("Список друзей пользователя {} получен", userStorage.getById(id).getName());
@@ -89,7 +89,7 @@ public class UserService {
     }
 
     public List<User> getMutualFriendsList(int firstId, int secondId) {
-        if(!userStorage.getUsers().containsKey(firstId) || !userStorage.getUsers().containsKey(secondId)) {
+        if (!userStorage.getUsers().containsKey(firstId) || !userStorage.getUsers().containsKey(secondId)) {
             throw new ObjectNotFoundException("По данным id один или несколько пользователей не найдены");
         }
         log.info("Список общих друзей пользователей {} и {} получен",

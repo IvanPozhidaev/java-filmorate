@@ -31,7 +31,7 @@ public class FilmService {
     }
 
     public Film getById(int id) {
-        if(!filmStorage.getFilms().containsKey(id)) {
+        if (!filmStorage.getFilms().containsKey(id)) {
             throw new ObjectNotFoundException("Фильм не найден");
         }
         log.info("Фильм с id {} отправлен", id);
@@ -39,7 +39,7 @@ public class FilmService {
     }
 
     public Film deleteById(int id) {
-        if(!filmStorage.getFilms().containsKey(id)) {
+        if (!filmStorage.getFilms().containsKey(id)) {
             throw new ObjectNotFoundException("Невозможно удалить - фильм не найден");
         }
         log.info("Фильм с id {} удалён", id);
@@ -47,7 +47,7 @@ public class FilmService {
     }
 
     public Film addLike(int filmId, int userId) {
-        if(!filmStorage.getFilms().containsKey(filmId)) {
+        if (!filmStorage.getFilms().containsKey(filmId)) {
             throw new ObjectNotFoundException("Фильм не найден");
         }
         filmStorage.getById(filmId).getUsersLikes().add(userId);
@@ -56,10 +56,10 @@ public class FilmService {
     }
 
     public Film removeLike(int filmId, int userId) {
-        if(!filmStorage.getFilms().containsKey(filmId)) {
+        if (!filmStorage.getFilms().containsKey(filmId)) {
             throw new ObjectNotFoundException("Фильм не найден");
         }
-        if(!filmStorage.getById(filmId).getUsersLikes().contains(userId)) {
+        if (!filmStorage.getById(filmId).getUsersLikes().contains(userId)) {
             throw new ObjectNotFoundException("Лайк отсутствует");
         }
         log.info("Пользователь с id {} удалил лайк к фильму с id {}", userId, filmId);
