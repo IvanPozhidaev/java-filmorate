@@ -1,7 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -12,9 +13,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class FilmService {
+
+    private static final Logger log = LoggerFactory.getLogger(FilmService.class);
+
     private final FilmStorage filmStorage;
 
     public Film create(Film film) {
@@ -69,9 +72,6 @@ public class FilmService {
     public List<Film> getPopularFilms(int count) {
         log.info("Список фильмов отправлен");
 
-        return filmStorage.findAll().stream()
-                .sorted((o1, o2) -> Integer.compare(o2.getUsersLikes().size(), o1.getUsersLikes().size()))
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.findAll().stream().sorted((o1, o2) -> Integer.compare(o2.getUsersLikes().size(), o1.getUsersLikes().size())).limit(count).collect(Collectors.toList());
     }
 }
