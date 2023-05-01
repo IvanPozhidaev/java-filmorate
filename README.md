@@ -46,6 +46,7 @@ WHERE id = 1;
 SELECT friend_id
 FROM friends
 WHERE user_id = 1
+AND friendship_confirmed = TRUE
 UNION
 SELECT user_id
 FROM friends
