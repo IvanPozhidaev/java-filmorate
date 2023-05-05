@@ -11,10 +11,10 @@ import ru.yandex.practicum.filmorate.storage.dao.FilmDbStorage;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmorateApplicationTests {
-	private final FilmDbStorage filmDbStorage;
+    private final FilmDbStorage filmDbStorage;
 
-	@Test
-	void contextLoads() {
-	}
+    @Test
+    void contextLoads() {
+    }
 
 }

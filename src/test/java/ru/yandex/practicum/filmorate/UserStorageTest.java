@@ -36,10 +36,10 @@ public class UserStorageTest {
             new ArrayList<>());
     private User user3 = new User(3,
             "3@ya.ru",
-                    "login3",
-                    "Name3",
-                    LocalDate.of(1980, 1, 1),
-                    new ArrayList<>());
+            "login3",
+            "Name3",
+            LocalDate.of(1980, 1, 1),
+            new ArrayList<>());
 
     @Test
     public void createUserTest() {
