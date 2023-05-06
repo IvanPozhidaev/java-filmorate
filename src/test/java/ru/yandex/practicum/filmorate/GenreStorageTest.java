@@ -23,7 +23,7 @@ class GenreStorageTest {
     private final GenreStorage genreStorage;
 
     @Test
-    public void getAllGenresTest() {
+    void getAllGenresTest() {
         Collection<Genre> genre = genreStorage.getAllGenres();
         Assertions.assertThat(genre)
                 .extracting(Genre::getName)
@@ -31,13 +31,13 @@ class GenreStorageTest {
     }
 
     @Test
-    public void getAllGenresSizeTest() {
+    void getAllGenresSizeTest() {
         Collection<Genre> genres = genreStorage.getAllGenres();
         assertEquals(6, genres.size());
     }
 
     @Test
-    public void getGenreByIdTest() {
+    void getGenreByIdTest() {
         Optional<Genre> genreOptional = Optional.ofNullable(genreStorage.getGenreById(1));
         assertThat(genreOptional)
                 .isPresent()

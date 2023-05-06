@@ -166,13 +166,18 @@ public class FilmDbStorage implements FilmStorage {
                 Objects.requireNonNull(resultSet.getDate("FILMS.RELEASE_DATE")).toLocalDate(),
                 resultSet.getInt("FILMS.DURATION"),
                 resultSet.getInt("FILMS.RATE"),
-                new Mpa(resultSet.getInt("RATING_MPA.RATING_ID"),
-                        resultSet.getString("RATING_MPA.MPA_NAME"),
-                        resultSet.getString("RATING_MPA.DESCRIPTION")),
+                getMpa(resultSet),
                 (List<Genre>) genreService.getFilmGenres(filmId),
                 getFilmLikes(filmId)
         );
         return film;
+    }
+
+    private Mpa getMpa(ResultSet resultSet) throws SQLException {
+        int ratingId = resultSet.getInt("RATING_MPA.RATING_ID");
+        String mpaName = resultSet.getString("RATING_MPA.MPA_NAME");
+        String description = resultSet.getString("RATING_MPA.DESCRIPTION");
+        return new Mpa(ratingId, mpaName, description);
     }
 
     private List<Integer> getFilmLikes(Integer filmId) {

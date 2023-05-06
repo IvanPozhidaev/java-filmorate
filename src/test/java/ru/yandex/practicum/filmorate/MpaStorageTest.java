@@ -22,7 +22,7 @@ class MpaStorageTest {
     private final MpaStorage mpaStorage;
 
     @Test
-    public void getAllMpaTest() {
+    void getAllMpaTest() {
         Collection<Mpa> mpa = mpaStorage.getAllMpa();
         Assertions.assertThat(mpa)
                 .extracting(Mpa::getName)
@@ -30,7 +30,7 @@ class MpaStorageTest {
     }
 
     @Test
-    public void getMpaByIdTest() {
+    void getMpaByIdTest() {
         Optional<Mpa> mpaOptional = Optional.ofNullable(mpaStorage.getMpaById(1));
         assertThat(mpaOptional)
                 .isPresent()

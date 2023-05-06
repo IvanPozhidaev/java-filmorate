@@ -54,21 +54,21 @@ class FilmStorageTest {
             new ArrayList<>());
 
     @Test
-    public void addFilmTest() {
+    void addFilmTest() {
         filmStorage.createFilm(film);
         AssertionsForClassTypes.assertThat(film).extracting("id").isNotNull();
         AssertionsForClassTypes.assertThat(film).extracting("name").isNotNull();
     }
 
     @Test
-    public void getFilmByIdTest() {
+    void getFilmByIdTest() {
         filmStorage.createFilm(film);
         Film dbFilm = filmStorage.getFilmById(1);
         assertThat(dbFilm).hasFieldOrPropertyWithValue("id", 1);
     }
 
     @Test
-    public void updateFilmTest() {
+    void updateFilmTest() {
         Film added = filmStorage.createFilm(film);
         added.setName("film updated");
         filmStorage.updateFilm(added);
@@ -77,7 +77,7 @@ class FilmStorageTest {
     }
 
     @Test
-    public void deleteFilmTest() {
+    void deleteFilmTest() {
         Film addedFilm1 = filmStorage.createFilm(film1);
         Film addedFilm2 = filmStorage.createFilm(film2);
         Collection<Film> beforeDelete = filmStorage.getAllFilms();

@@ -23,33 +23,33 @@ public class UserStorageTest {
     private final UserDbStorage userStorage;
 
     private User user1 = new User(1,
-            "1@ya.ru",
+            "test1@test.ru",
             "login1",
             "Name1",
             LocalDate.of(1980, 1, 1),
             new ArrayList<>());
     private User user2 = new User(2,
-            "2@ya.ru",
+            "test2@test.ru",
             "login2",
             "Name2",
             LocalDate.of(1980, 1, 1),
             new ArrayList<>());
     private User user3 = new User(3,
-            "3@ya.ru",
+            "test3@test.ru",
             "login3",
             "Name3",
             LocalDate.of(1980, 1, 1),
             new ArrayList<>());
 
     @Test
-    public void createUserTest() {
+    void createUserTest() {
         userStorage.createUser(user1);
         AssertionsForClassTypes.assertThat(user1).extracting("id").isNotNull();
         AssertionsForClassTypes.assertThat(user1).extracting("name").isNotNull();
     }
 
     @Test
-    public void getAllUsersTest() {
+    void getAllUsersTest() {
         userStorage.createUser(user2);
         userStorage.createUser(user3);
         Collection<User> dbUsers = userStorage.getAllUsers();
@@ -57,7 +57,7 @@ public class UserStorageTest {
     }
 
     @Test
-    public void deleteUserTest() {
+    void deleteUserTest() {
         Collection<User> beforeDelete = userStorage.getAllUsers();
         userStorage.deleteUser(user1);
         Collection<User> afterDelete = userStorage.getAllUsers();

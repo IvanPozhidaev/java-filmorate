@@ -2,15 +2,19 @@ package ru.yandex.practicum.filmorate.storage.dao;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.GenreStorage;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -26,10 +30,12 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public boolean addFilmGenres(int filmId, Collection<Genre> genres) {
+        String sqlQuery = "INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?) ON CONFLICT DO NOTHING";
+        List<Object[]> batchArgs = new ArrayList<>();
         for (Genre genre : genres) {
-            String sqlQuery = "INSERT INTO FILM_GENRE (FILM_ID, GENRE_ID) VALUES (?, ?) ON CONFLICT DO NOTHING";
-            jdbcTemplate.update(sqlQuery, filmId, genre.getId());
+            batchArgs.add(new Object[]{filmId, genre.getId()});
         }
+        int[] updateCounts = jdbcTemplate.batchUpdate(sqlQuery, batchArgs);
         return true;
     }
 
