@@ -1,77 +1,125 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.exception.FilmValidationException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import java.time.LocalDate;
 import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 @Service
-@RequiredArgsConstructor
+@Slf4j
 public class FilmService {
-
-    private static final Logger log = LoggerFactory.getLogger(FilmService.class);
-
+    private static int counter = 1;
+    private final Validator validator;
     private final FilmStorage filmStorage;
+    private final UserService userService;
+    private static final LocalDate DATA_THRESHOLD = LocalDate.of(1895, 12, 28);
 
-    public Film create(Film film) {
-        return filmStorage.create(film);
+    @Autowired
+    public FilmService(Validator validator, FilmStorage filmStorage,
+                       @Autowired(required = false) UserService userService) {
+        this.validator = validator;
+        this.filmStorage = filmStorage;
+        this.userService = userService;
     }
 
-    public Film update(Film film) {
-        return filmStorage.update(film);
-    }
-
-    public Collection<Film> findAll() {
+    public Collection<Film> getAllFilms() {
         log.info("Список фильмов отправлен");
-        return filmStorage.findAll();
+        return filmStorage.getAllFilms();
     }
 
-    public Film getById(int id) {
-        if (!filmStorage.getFilms().containsKey(id)) {
-            throw new ObjectNotFoundException("Фильм не найден");
-        }
-        log.info("Фильм с id {} отправлен", id);
-        return filmStorage.getById(id);
+    public Film createFilm(Film film) {
+        validate(film);
+        validateReleaseDate(film, "");
+        return filmStorage.createFilm(film);
     }
 
-    public Film deleteById(int id) {
-        if (!filmStorage.getFilms().containsKey(id)) {
-            throw new ObjectNotFoundException("Невозможно удалить - фильм не найден");
-        }
-        log.info("Фильм с id {} удалён", id);
-        return filmStorage.deleteById(id);
+    public Film updateFilm(Film film) {
+        validate(film);
+        validateReleaseDate(film, "");
+        return filmStorage.updateFilm(film);
     }
 
-    public Film addLike(int filmId, int userId) {
-        if (!filmStorage.getFilms().containsKey(filmId)) {
-            throw new ObjectNotFoundException("Фильм не найден");
-        }
-        filmStorage.getById(filmId).getUsersLikes().add(userId);
-        log.info("Пользователь с id {} поставил лайк фильму с id {}", userId, filmId);
-        return filmStorage.getById(filmId);
+    public void addLike(String filmId, String userId) {
+        Film film = getFilmStored(filmId);
+        User user = userService.getUserById(userId);
+        filmStorage.addLike(film.getId(), user.getId());
+        log.info("Фильму с id: '{}' поставлен лайк", filmId);
     }
 
-    public Film removeLike(int filmId, int userId) {
-        if (!filmStorage.getFilms().containsKey(filmId)) {
-            throw new ObjectNotFoundException("Фильм не найден");
-        }
-        if (!filmStorage.getById(filmId).getUsersLikes().contains(userId)) {
-            throw new ObjectNotFoundException("Лайк отсутствует");
-        }
-        log.info("Пользователь с id {} удалил лайк к фильму с id {}", userId, filmId);
-        return filmStorage.getById(filmId);
+    public void deleteLike(String filmId, String userId) {
+        Film film = getFilmStored(filmId);
+        User user = userService.getUserById(userId);
+        filmStorage.deleteLike(film.getId(), user.getId());
+        log.info("У фильма с id: '{}' удалён лайк", filmId);
     }
 
-    public List<Film> getPopularFilms(int count) {
-        log.info("Список фильмов отправлен");
+    public Collection<Film> getPopularFilms(String count) {
+        Integer size = parseId(count);
+        if (size == Integer.MIN_VALUE) {
+            size = 10;
+        }
+        log.info("Список популярных фильмов");
+        return filmStorage.getPopularFilms(size);
+    }
 
-        return filmStorage.findAll().stream().sorted((o1, o2) -> Integer.compare(o2.getUsersLikes().size(), o1.getUsersLikes().size())).limit(count).collect(Collectors.toList());
+    public void validateReleaseDate(Film film, String text) {
+        if (film.getReleaseDate().isBefore(DATA_THRESHOLD)) {
+            throw new ValidationException("Дата релиза не может быть ранее, чем " + DATA_THRESHOLD);
+        }
+        log.debug("{} фильм: '{}'", text, film.getName());
+    }
+
+    private void validate(Film film) {
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<Film> filmConstraintViolation : violations) {
+                sb.append(filmConstraintViolation.getMessage());
+            }
+            throw new FilmValidationException("Ошибка валидации фильма " + sb, violations);
+        }
+        if (film.getId() == 0) {
+            film.setId(getNextId());
+        }
+    }
+
+    private static int getNextId() {
+        return counter++;
+    }
+
+    public Film getFilmById(String id) {
+        log.info("Фильм с id: '{}'", id);
+        return getFilmStored(id);
+    }
+
+    private Integer parseId(final String id) {
+        try {
+            return Integer.valueOf(id);
+        } catch (NumberFormatException e) {
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    private Film getFilmStored(final String id) {
+        final int filmId = parseId(id);
+        if (filmId == Integer.MIN_VALUE) {
+            throw new NotFoundException("Не удалось найти id фильма: '{}'", id);
+        }
+        Film film = filmStorage.getFilmById(filmId);
+        if (film == null) {
+            throw new NotFoundException("Фильм с id {} не найден", String.valueOf(filmId));
+        }
+        return film;
     }
 }
